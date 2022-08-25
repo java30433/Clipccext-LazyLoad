@@ -39,7 +39,7 @@ class Lazyload extends Extension {
 			param: {
                 url: {
                     type: type.ParameterType.STRING,
-                    default: 'https://api.codingclip.com/v1/project/asset/b4609e706e4d08f0cd7d220b5d2a634c.mp3'
+                    default: 'b4609e706e4d08f0cd7d220b5d2a634c.mp3'
                 },
 				name: {
                     type: type.ParameterType.STRING,
@@ -47,7 +47,7 @@ class Lazyload extends Extension {
                 }
 			},
 			function: (args, util) => {
-				if (runtime.version.startsWith('c') && !args.url.startsWith('https://api.codingclip.com/v1/project/asset/')) return;
+				if (runtime.version.startsWith('c')) args.url = "https://api.codingclip.com/v1/project/asset/" + args.url;
 				if (mp3.get(args.name) && mp3.get(args.name).url == args.url) return; //如果已经加载了一样的就不重复加载了
 				return mp3.pushAudio(args.name, args.url);
 			}
