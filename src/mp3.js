@@ -41,6 +41,7 @@ mp3.pushAudio = function(name, url) {
 				//开始播放
 				mp3ins.play = function() {
 					if(mp3ins.isPlaying) return;
+					mp3ins.isPlaying = true;
 					//初始化buffSource
 					mp3ins.source = ctx.createBufferSource();
 					mp3ins.source.buffer = mp3ins.buffer;
@@ -50,7 +51,13 @@ mp3.pushAudio = function(name, url) {
 					mp3ins.source.onended = function() {
 						mp3ins.isPlaying = false;
 						mp3ins.stopTime = ctx.currentTime;
-						mp3ins.time = (ctx.currentTime - mp3ins.startTime)*mp3ins.rate + mp3ins.time;
+						if (mp3ins.timeset) {
+							mp3ins.time = mp3ins.timeset;
+							mp3ins.play();
+							mp3ins.timeset = 0;
+						} else {
+							mp3ins.time = (ctx.currentTime - mp3ins.startTime)*mp3ins.rate + mp3ins.time;
+						}
 					};
 					
 					mp3ins.source.connect(mp3ins.gainNode); //链接音量节点
@@ -58,7 +65,6 @@ mp3.pushAudio = function(name, url) {
 					mp3ins.pannerNode.connect(ctx.destination); //链接输出
 					
 					mp3ins.source.start(0, mp3ins.time); //播放
-					mp3ins.isPlaying = true;
 					mp3ins.startTime = ctx.currentTime;
 				};
 				//暂停
@@ -69,12 +75,8 @@ mp3.pushAudio = function(name, url) {
 				mp3ins.setTime = function(s) {
 					try {
 						if(mp3ins.isPlaying) {
-							mp3ins.source.onended = function(){};
-							mp3ins.source.stop();
-							mp3ins.stopTime = ctx.currentTime;
-							mp3ins.time = s;
-							mp3ins.isPlaying = false;
-							mp3ins.play();
+							mp3ins.timeset = s;
+							mp3ins.pause();
 						} else {
 							mp3ins.time = s;
 						}

@@ -29,7 +29,7 @@ class MyExtension extends Extension {
 		runtime.on('PROJECT_STOP_ALL', ()=>{
 			Object.values(mp3.list).forEach(mp3ins=>{
 				mp3ins.pause();
-				mp3ins.time = s;
+				mp3ins.time = 0;
 			})
 		});
 		
@@ -74,14 +74,14 @@ class MyExtension extends Extension {
 				},
 				rate: {
 					type: type.ParameterType.NUMBER,
-                    default: 'Name'
+                    default: 1
 				}
 			},
 			function: args => {
 				if (!mp3.get(args.name)) return;
 				const mp3ins = mp3.get(args.name);
 				mp3ins.loop = (args.n == 'loop');
-				mp3ins.rate = isNaN(args.rate) ? 1 : args.rate;
+				mp3ins.rate = isNaN(args.rate) ? 1 : Math.min(Math.max(0, args.rate), 16);
 				mp3ins.play();
 			}
 		});
@@ -145,7 +145,7 @@ class MyExtension extends Extension {
 			function: args => {
 				if (!mp3.get(args.name)) return;
 				const mp3ins = mp3.get(args.name);
-				let v = isNaN(args.v) ? 0 : args.v;
+				const v = isNaN(args.v) ? 0 : Number(args.v);
 				switch (args.n) {
 					case 'currentTime':
 						mp3ins.setTime(v);
@@ -265,7 +265,7 @@ class MyExtension extends Extension {
 			function: args => {
 				if (!mp3.get(args.name)) return;
 				const mp3ins = mp3.get(args.name);
-				mp3ins.setRate(isNaN(args.rate) ? 1 : args.rate);
+				mp3ins.setRate(isNaN(args.rate) ? 1 : Number(args.rate));
 			},
 			option: {
 				//隐藏积木 播放过程中设置播放倍速会导致getNow()函数的偏差

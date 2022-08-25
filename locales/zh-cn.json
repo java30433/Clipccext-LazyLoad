@@ -1,6 +1,6 @@
 {
-    "java30433.lazyload.name": "懒加载",
-    "java30433.lazyload.category": "懒加载",
+    "java30433.lazyload.name": "懒加载音乐",
+    "java30433.lazyload.category": "懒加载音乐",
     "java30433.lazyload.description": "懒加载音乐",
     "java30433.lazyload.block.loadMusic": "从[url]加载音乐并储存为[name]",
     "java30433.lazyload.block.playMusic": "以[rate]倍速播放音乐[name]并[n]",
