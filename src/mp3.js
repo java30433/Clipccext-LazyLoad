@@ -102,7 +102,7 @@ mp3.pushAudio = function(name, url) {
 					mp3ins.pannerNode.positionX.value = v; //这玩意其实大有搞头，不过我懒得写了。X方向的调节应该够用了
 				}
 				mp3ins.getPanner = function() {
-					return mp3ins.pannerNode.positionX;
+					return mp3ins.pannerNode.positionX.value;
 				}
 				
 				resolve(); //OVER!
