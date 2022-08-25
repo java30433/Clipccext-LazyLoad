@@ -20,6 +20,7 @@ mp3.pushAudio = function(name, url) {
 				mp3ins.startTime = ctx.currentTime;
 				mp3ins.stopTime = ctx.currentTime;
 				mp3ins.duration = mp3ins.buffer.duration;
+				mp3ins.isPlaying = false;
 				//初始化rate
 				mp3ins.rate = 1;
 				//初始化音量节点
