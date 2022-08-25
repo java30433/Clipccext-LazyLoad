@@ -217,7 +217,7 @@ class MyExtension extends Extension {
 						messageId: 'java30433.lazyload.menu.ended',
 						value: 'ended'
 					}, {
-						messageId: 'java30433.lazyload.menu.paused',
+						messageId: 'java30433.lazyload.menu.playing',
 						value: 'playing'
 					}, {
 						messageId: 'java30433.lazyload.menu.loaded',
