@@ -1,0 +1,45 @@
+Arguments: 
+  /usr/bin/node /root/.node/corepack/yarn/1.22.19/bin/yarn.js
+
+PATH: 
+  /usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  18.6.0
+
+Platform: 
+  linux arm64
+
+Trace: 
+  Error: Client network socket disconnected before secure TLS connection was established
+      at connResetException (node:internal/errors:704:14)
+      at TLSSocket.onConnectEnd (node:_tls_wrap:1589:19)
+      at TLSSocket.emit (node:events:525:35)
+      at endReadableNT (node:internal/streams/readable:1359:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+
+npm manifest: 
+  {
+      "name": "clipcc-extension-java30433-datacloud",
+      "version": "1.0.0",
+      "author": "java30433",
+      "scripts": {
+          "build": "rimraf ./build && mkdirp build && rimraf ./dist && mkdirp dist && webpack --bail",
+          "build:dist": "NODE_ENV=production npm run build"
+      },
+      "dependencies": {
+          "webpack-cli": "^4.10.0",
+          "copy-webpack-plugin": "^11.0.0",
+          "webpack": "^5.73.0",
+          "zip-webpack-plugin": "^4.0.1"
+      }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
