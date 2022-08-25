@@ -27,7 +27,7 @@ mp3.pushAudio = function(name, url) {
 				mp3ins.gainNode = ctx.createGain();
 				mp3ins.gainNode.gain.value = 1;
 				//初始化左右平衡节点
-				mp3ins.pannerNode = ctx.createPanner();
+				mp3ins.pannerNode = ctx.createStereoPanner();
 				
 				
 				//获取当前播放时长
@@ -86,7 +86,7 @@ mp3.pushAudio = function(name, url) {
 				
 				//设置音乐音量 0~1
 				mp3ins.setVolume = function(volume) {
-					mp3ins.gainNode.gain.value = volume;
+					mp3ins.gainNode.gain.value = Math.min(Math.max(0,volume), 1);
 				}
 				mp3ins.getVolume = function(){
 					return mp3ins.gainNode.gain.value;
@@ -100,10 +100,10 @@ mp3.pushAudio = function(name, url) {
 				
 				//设置左右平衡
 				mp3ins.setPanner = function(v) {
-					mp3ins.pannerNode.positionX.value = v; //这玩意其实大有搞头，不过我懒得写了。X方向的调节应该够用了
+					mp3ins.pannerNode.pan.value = Math.min(Math.max(-1,v), 1);
 				}
 				mp3ins.getPanner = function() {
-					return mp3ins.pannerNode.positionX.value;
+					return mp3ins.pannerNode.pan.value;
 				}
 				
 				resolve(); //OVER!
