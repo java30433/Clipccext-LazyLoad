@@ -1,0 +1,274 @@
+const { Extension, type, api } = require('clipcc-extension');
+
+class MyExtension extends Extension {
+	constructor () {
+        super();
+	}
+    onInit() {
+		const runtime = api.getVmInstance().runtime;
+		const musicList = {};
+		const musicList_cache = {};
+		api.addCategory({
+			categoryId: 'java30433.lazyload.category',
+			messageId: 'java30433.lazyload.category',
+			color: '#31A151'
+		});
+		const addBlock = function(blockJson){
+			let opcode = "java30433.lazyload.block." + blockJson.opcode;
+			api.addBlock({
+				opcode: opcode,
+				messageId: opcode,
+				categoryId: 'java30433.lazyload.category',
+				type: blockJson.type,
+				param: blockJson.param,
+				function: blockJson.function
+			});
+		};
+		//在项目停止时停止所有音乐的播放
+		runtime.on('PROJECT_STOP_ALL', ()=>{
+			Object.values(musicList).forEach(mp3=>{
+				mp3.pause();
+				mp3.currentTime = 0;
+				mp3.playbackRate = 1;
+				mp3.volume = 1;
+				mp3.loop = false;
+			})
+		});
+		//在项目开始时清空音乐音效
+		runtime.on('PROJECT_START', ()=>{
+		});
+		
+		addBlock({
+			opcode: 'loadMusic',
+			type: type.BlockType.COMMAND,
+			param: {
+                url: {
+                    type: type.ParameterType.STRING,
+                    default: 'https://api.codingclip.com/v1/project/asset/b4609e706e4d08f0cd7d220b5d2a634c.mp3'
+                },
+				name: {
+                    type: type.ParameterType.STRING,
+                    default: 'Name'
+                }
+			},
+			function: (args, util) => {
+				if (runtime.version.startsWith('c') && !args.url.startsWith('https://api.codingclip.com/v1/project/asset/')) return;
+				const load = function() {
+					if (musicList[args.name] && musicList[args.name].src == args.url) return; //如果已经加载了一样的就不重复加载了
+					let mp3 = new Audio(args.url);
+					musicList[args.name] = mp3;
+					musicList_cache[args.name] = 2;
+					mp3.oncanplaythrough = function() {
+						//似乎每次播放音乐也会触发一次这个事件
+						if(musicList_cache[args.name]==2) {
+							musicList_cache[args.name] = 1;
+							util.thread.status = 0;
+						}
+					}
+					mp3.load();
+					util.thread.status = 1;
+				}
+				/*
+				 * musicList_cache 储存当前音频的加载状态。
+				 * 0: 未加载/加载完成 即当前name位空闲，可以替换/加载
+				 * 1: 加载完成
+				 * 2 && util.thread.status == 1: 加载中
+				 * 2 && util.thread.status == 0: 之前在加载的过程中停止了脚本，现在重新调用
+				 *
+				 * 当线程由1状态转为0时会再调用一次这个function，所以需要做检查
+				*/
+				switch (musicList_cache[args.name]) {
+					case 1:
+						musicList_cache[args.name] = 0;
+						break;
+					case 2:
+						if (util.thread.status == 0) {
+							load();
+						}
+						break;
+					default:
+						load();
+						break;
+				}
+			}
+		});
+		addBlock({
+			opcode: 'playMusic',
+			type: type.BlockType.COMMAND,
+			param: {
+				name: {
+                    type: type.ParameterType.STRING,
+                    default: 'Name'
+                }
+			},
+			function: args => {
+				let mp3 = musicList[args.name];
+				if(!mp3) return;
+				mp3.play();
+			}
+		});
+		addBlock({
+			opcode: 'pauseMusic',
+			type: type.BlockType.COMMAND,
+			param: {
+				name: {
+                    type: type.ParameterType.STRING,
+                    default: 'Name'
+                }
+			},
+			function: args => {
+				let mp3 = musicList[args.name];
+				if(!mp3) return;
+				mp3.pause();
+			}
+		});
+		addBlock({
+			opcode: 'setMusicTime',
+			type: type.BlockType.COMMAND,
+			param: {
+                n: {
+                    type: type.ParameterType.NUMBER,
+                    default: '0'
+                },
+				name: {
+                    type: type.ParameterType.STRING,
+                    default: 'Name'
+                }
+			},
+			function: args => {
+				args.n = isNaN(args.n) ? 0 : args.n;
+				let mp3 = musicList[args.name];
+				if(!mp3) return;
+				mp3.currentTime = args.n;
+			}
+		});
+		addBlock({
+			opcode: 'setMusicEffect',
+			type: type.BlockType.COMMAND,
+			param: {
+				n: {
+                    type: type.ParameterType.STRING,
+					field: true,
+                    menu: [{
+						messageId: 'java30433.lazyload.menu.playbackRate',
+						value: 'playbackRate'
+					}, {
+						messageId: 'java30433.lazyload.menu.volume',
+						value: 'volume'
+					}],
+					default: 'currentTime'
+				},
+                v: {
+                    type: type.ParameterType.NUMBER,
+                    default: 0
+                },
+				name: {
+                    type: type.ParameterType.STRING,
+                    default: 'Name'
+                }
+			},
+			function: args => {
+				args.v = isNaN(args.v) ? 0 : args.v;
+				let mp3 = musicList[args.name];
+				if(!mp3) return;
+				mp3[args.n] = args.v;
+			}
+		});
+		addBlock({
+			opcode: 'setMusicLoop',
+			type: type.BlockType.COMMAND,
+			param: {
+                n: {
+                    type: type.ParameterType.NUMBER,
+					field: true,
+                    menu: [{
+						messageId: 'java30433.lazyload.menu.loop',
+						value: 1
+					}, {
+						messageId: 'java30433.lazyload.menu.unloop',
+						value: 0
+					}],
+					default: 1
+				},
+				name: {
+                    type: type.ParameterType.STRING,
+                    default: 'Name'
+                }
+			},
+			function: args => {
+				let mp3 = musicList[args.name];
+				if(!mp3) return;
+				mp3.loop = args.n;
+			}
+		});
+		addBlock({
+			opcode: 'getMusicState',
+			type: type.BlockType.REPORTER,
+			param: {
+				n: {
+                    type: type.ParameterType.STRING,
+					field: true,
+                    menu: [{
+						messageId: 'java30433.lazyload.menu.currentTime',
+						value: 'currentTime'
+					}, {
+						messageId: 'java30433.lazyload.menu.duration',
+						value: 'duration'
+					}, {
+						messageId: 'java30433.lazyload.menu.playbackRate',
+						value: 'playbackRate'
+					}, {
+						messageId: 'java30433.lazyload.menu.volume',
+						value: 'volume'
+					}],
+					default: 'currentTime'
+				},
+				name: {
+                    type: type.ParameterType.STRING,
+                    default: 'Name'
+                }
+			},
+			function: args => {
+				let mp3 = musicList[args.name];
+				if(!mp3) return args.name + " does not exist";
+				return mp3[args.n];
+			}
+		});
+		addBlock({
+			opcode: 'getMusicStateBool',
+			type: type.BlockType.BOOLEAN,
+			param: {
+				n: {
+                    type: type.ParameterType.STRING,
+					field: true,
+                    menu: [{
+						messageId: 'java30433.lazyload.menu.loop',
+						value: 'loop'
+					}, {
+						messageId: 'java30433.lazyload.menu.ended',
+						value: 'ended'
+					}, {
+						messageId: 'java30433.lazyload.menu.paused',
+						value: 'paused'
+					}, {
+						messageId: 'java30433.lazyload.menu.loaded',
+						value: 'loaded'
+					}],
+					default: 'loaded'
+				},
+				name: {
+                    type: type.ParameterType.STRING,
+                    default: 'Name'
+                }
+			},
+			function: args => {
+				let mp3 = musicList[args.name];
+				if(!mp3) return;
+				if (args.n == 'loaded') return (musicList_cache[args.name]===0);
+				return mp3[args.n];
+			}
+		});
+	}
+}
+
+module.exports = MyExtension;

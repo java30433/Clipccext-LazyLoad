@@ -1,0 +1,23 @@
+{
+    "java30433.lazyload.name": "Lazy Loading Music",
+    "java30433.lazyload.category": "Lazy Loading Music",
+    "java30433.lazyload.description": "Get the music file on the server, load it into the project, and then play it",
+    "java30433.lazyload.block.loadMusic": "Load music from [url] and save it as [name]",
+    "java30433.lazyload.block.playMusic": "Play [name] at [rate]x speed and [n]",
+	"java30433.lazyload.block.pauseMusic": "Pause [name]",
+	"java30433.lazyload.block.deleteMusic": "Delete [name]",
+	"java30433.lazyload.block.setMusicEffect": "Set [n] of [name] to [v]",
+	"java30433.lazyload.menu.loop": "Loop Playback",
+	"java30433.lazyload.menu.unloop": "No looping",
+	"java30433.lazyload.block.getMusicState": "The [n] of [name]",
+	"java30433.lazyload.menu.currentTime": "current playback time",
+	"java30433.lazyload.menu.duration": "duration",
+	"java30433.lazyload.menu.rate": "speed",
+	"java30433.lazyload.menu.volume": "volume",
+	"java30433.lazyload.menu.panner": "pan left/right",
+	"java30433.lazyload.block.setRate": "Set the playback speed of [name] to [rate]x (Unsafe)",
+	"java30433.lazyload.block.getMusicStateBool": "Is [name] [n]?",
+	"java30433.lazyload.menu.ended": "play finished",
+	"java30433.lazyload.menu.playing": "playing",
+	"java30433.lazyload.menu.loaded": "loading completed"
+}

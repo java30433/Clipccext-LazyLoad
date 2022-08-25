@@ -1,0 +1,16 @@
+{
+    "name": "clipcc-extension-java30433-datacloud",
+    "version": "1.0.0",
+    "author": "java30433",
+    "scripts": {
+        "build": "rimraf ./build && mkdirp build && rimraf ./dist && mkdirp dist && webpack --bail",
+        "build:dist": "NODE_ENV=production npm run build"
+    },
+    "devDependencies": {
+        "webpack-cli": "^4.10.0",
+        "copy-webpack-plugin": "^11.0.0",
+        "webpack": "^5.73.0",
+        "zip-webpack-plugin": "^4.0.1"
+    },
+    "dependencies": {}
+}
