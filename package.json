@@ -6,11 +6,15 @@
         "build": "rimraf ./build && mkdirp build && rimraf ./dist && mkdirp dist && webpack --bail",
         "build:dist": "NODE_ENV=production npm run build"
     },
-    "devDependencies": {
-        "webpack-cli": "^4.10.0",
-        "copy-webpack-plugin": "^11.0.0",
-        "webpack": "^5.73.0",
-        "zip-webpack-plugin": "^4.0.1"
+    "dependencies": {
+        "clipcc-extension": "^0.1.9"
     },
-    "dependencies": {}
+    "devDependencies": {
+        "copy-webpack-plugin": "^11.0.0",
+        "mkdirp": "^1.0.4",
+        "rimraf": "^3.0.2",
+        "webpack": "^5.74.0",
+        "webpack-cli": "^4.10.0",
+        "zip-webpack-plugin": "^4.0.1"
+    }
 }

@@ -1,7 +1,7 @@
 const { Extension, type, api } = require('clipcc-extension');
 const mp3 = require('./mp3');
 
-class MyExtension extends Extension {
+class Lazyload extends Extension {
 	constructor () {
         super();
 	}
@@ -11,7 +11,7 @@ class MyExtension extends Extension {
 		api.addCategory({
 			categoryId: 'java30433.lazyload.category',
 			messageId: 'java30433.lazyload.category',
-			color: '#31A151'
+			color: '#BCAAA4'
 		});
 		const addBlock = function(blockJson){
 			let opcode = "java30433.lazyload.block." + blockJson.opcode;
@@ -43,7 +43,7 @@ class MyExtension extends Extension {
                 },
 				name: {
                     type: type.ParameterType.STRING,
-                    default: 'Name'
+                    default: 'Ushio'
                 }
 			},
 			function: (args, util) => {
@@ -58,7 +58,7 @@ class MyExtension extends Extension {
 			param: {
 				name: {
                     type: type.ParameterType.STRING,
-                    default: 'Name'
+                    default: 'Ushio'
                 },
 				n: {
                     type: type.ParameterType.STRING,
@@ -91,7 +91,7 @@ class MyExtension extends Extension {
 			param: {
 				name: {
                     type: type.ParameterType.STRING,
-                    default: 'Name'
+                    default: 'Ushio'
                 }
 			},
 			function: args => {
@@ -105,7 +105,7 @@ class MyExtension extends Extension {
 			param: {
 				name: {
                     type: type.ParameterType.STRING,
-                    default: 'Name'
+                    default: 'Ushio'
                 }
 			},
 			function: args => {
@@ -139,7 +139,7 @@ class MyExtension extends Extension {
                 },
 				name: {
                     type: type.ParameterType.STRING,
-                    default: 'Name'
+                    default: 'Ushio'
                 }
 			},
 			function: args => {
@@ -186,7 +186,7 @@ class MyExtension extends Extension {
 				},
 				name: {
                     type: type.ParameterType.STRING,
-                    default: 'Name'
+                    default: 'Ushio'
                 }
 			},
 			function: args => {
@@ -230,7 +230,7 @@ class MyExtension extends Extension {
 				},
 				name: {
                     type: type.ParameterType.STRING,
-                    default: 'Name'
+                    default: 'Ushio'
                 }
 			},
 			function: args => {
@@ -255,7 +255,7 @@ class MyExtension extends Extension {
 			param: {
 				name: {
                     type: type.ParameterType.STRING,
-                    default: 'Name'
+                    default: 'Ushio'
                 },
 				rate: {
 					type: type.ParameterType.NUMBER,
@@ -273,6 +273,10 @@ class MyExtension extends Extension {
 			}
 		});
 	}
+
+    onUninit () {
+        api.removeCategory('java30433.lazyload.category');
+    }
 }
 
-module.exports = MyExtension;
+module.exports = Lazyload;
