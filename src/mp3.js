@@ -50,13 +50,9 @@ mp3.pushAudio = function(name, url) {
 					mp3ins.source.playbackRate.value = mp3ins.rate; //应用播放倍率
 					//设置结束时的操作
 					mp3ins.source.onended = function() {
-						mp3ins.isPlaying = false;
-						mp3ins.stopTime = ctx.currentTime;
-						if (mp3ins.timeset) {
-							mp3ins.time = mp3ins.timeset;
-							mp3ins.play();
-							mp3ins.timeset = 0;
-						} else {
+						if (isPlaying) { //如果是通过pause方法暂停，playing会被先设为flase.如果是播完自动暂停就仍是true
+							mp3ins.isPlaying = false;
+							mp3ins.stopTime = ctx.currentTime;
 							mp3ins.time = (ctx.currentTime - mp3ins.startTime)*mp3ins.rate + mp3ins.time;
 						}
 					};
@@ -70,36 +66,54 @@ mp3.pushAudio = function(name, url) {
 				};
 				//暂停
 				mp3ins.pause = function() {
-					if(mp3ins.source) mp3ins.source.stop(); //停止
+					if(mp3ins.source) {
+						mp3ins.isPlaying = false;
+						mp3ins.stopTime = ctx.currentTime;
+						mp3ins.time = (ctx.currentTime - mp3ins.startTime)*mp3ins.rate + mp3ins.time;
+						mp3ins.source.stop(); //停止
+					}
 				}
 				//设置当前播放进度 TODO
 				mp3ins.setTime = function(s) {
-					try {
-						if(mp3ins.isPlaying) {
-							mp3ins.timeset = s;
-							mp3ins.pause();
-						} else {
-							mp3ins.time = s;
-						}
-					} catch(e) {} //No problem
+					
+					s = isNaN(s) ? 0 : Number(s); //转数字
+					if (s > mp3ins.duration) s=mp3ins.duration; //限制最大不超过长度
+					if (s < 0) {
+						if (s < -mp3ins.duration) s=0;
+						s += mp3ins.duration; //是负数则从长度减去
+					}
+					
+					mp3ins.time = s;
+					if(mp3ins.isPlaying) {
+						mp3ins.isPlaying = false;
+						mp3ins.stopTime = ctx.currentTime;
+						mp3ins.source.stop(); //停止
+					}
 				}
 				
-				//设置音乐音量 0~1
+				//设置音乐音量 0~100
 				mp3ins.setVolume = function(volume) {
+					volume = isNaN(volume) ? 0 : Number(volume)/100; //转数字并缩小一百倍
 					mp3ins.gainNode.gain.value = Math.min(Math.max(0,volume), 1);
 				}
 				mp3ins.getVolume = function(){
 					return mp3ins.gainNode.gain.value;
 				}
 				
-				//设置rate 动态更改可行，但会导致getNow无法获取准确时间 TODO
+				//设置rate 动态更改
 				mp3ins.setRate = function(rate) {
 					mp3ins.rate = rate;
-					if (mp3ins.isPlaying) mp3ins.source.playbackRate.value = rate;
+					if (mp3ins.isPlaying) {
+						mp3ins.source.onended = function() {
+							mp3ins.play();
+						};
+						mp3ins.pause();
+					}
 				}
 				
 				//设置左右平衡
 				mp3ins.setPanner = function(v) {
+					v = isNaN(v) ? 0 : Number(v)/100; //转数字并缩小一百倍
 					mp3ins.pannerNode.pan.value = Math.min(Math.max(-1,v), 1);
 				}
 				mp3ins.getPanner = function() {
@@ -118,5 +132,3 @@ mp3.get = function(name) {
 }
 
 module.exports = mp3;
-//const buffer = await _getBuffer(URL);
-//buffer && playAudio(buffer);
