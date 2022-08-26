@@ -81,7 +81,7 @@ class Lazyload extends Extension {
 				if (!mp3.get(args.name)) return;
 				const mp3ins = mp3.get(args.name);
 				mp3ins.loop = (args.n == 'loop');
-				mp3ins.rate = isNaN(args.rate) ? 1 : Math.min(Math.max(0, args.rate), 16);
+				mp3ins.rate = isNaN(args.rate) ? 1 : Number(args.rate));
 				mp3ins.play();
 			}
 		});
