@@ -50,7 +50,7 @@ mp3.pushAudio = function(name, url) {
 					mp3ins.source.playbackRate.value = mp3ins.rate; //应用播放倍率
 					//设置结束时的操作
 					mp3ins.source.onended = function() {
-						if (isPlaying) { //如果是通过pause方法暂停，playing会被先设为flase.如果是播完自动暂停就仍是true
+						if (mp3ins.isPlaying) { //如果是通过pause方法暂停，playing会被先设为flase.如果是播完自动暂停就仍是true
 							mp3ins.isPlaying = false;
 							mp3ins.stopTime = ctx.currentTime;
 							mp3ins.time = (ctx.currentTime - mp3ins.startTime)*mp3ins.rate + mp3ins.time;
@@ -76,7 +76,6 @@ mp3.pushAudio = function(name, url) {
 				//设置当前播放进度 TODO
 				mp3ins.setTime = function(s) {
 					
-					s = isNaN(s) ? 0 : Number(s); //转数字
 					if (s > mp3ins.duration) s=mp3ins.duration; //限制最大不超过长度
 					if (s < 0) {
 						if (s < -mp3ins.duration) s=0;
@@ -93,7 +92,7 @@ mp3.pushAudio = function(name, url) {
 				
 				//设置音乐音量 0~100
 				mp3ins.setVolume = function(volume) {
-					volume = isNaN(volume) ? 0 : Number(volume)/100; //转数字并缩小一百倍
+					volume = volume/100; //转数字并缩小一百倍
 					mp3ins.gainNode.gain.value = Math.min(Math.max(0,volume), 1);
 				}
 				mp3ins.getVolume = function(){
@@ -102,7 +101,7 @@ mp3.pushAudio = function(name, url) {
 				
 				//设置rate 动态更改
 				mp3ins.setRate = function(rate) {
-					mp3ins.rate = rate;
+					mp3ins.rate = Math.min(Math.max(0, rate), 16);
 					if (mp3ins.isPlaying) {
 						mp3ins.source.onended = function() {
 							mp3ins.play();
@@ -113,7 +112,7 @@ mp3.pushAudio = function(name, url) {
 				
 				//设置左右平衡
 				mp3ins.setPanner = function(v) {
-					v = isNaN(v) ? 0 : Number(v)/100; //转数字并缩小一百倍
+					v = v/100; //转数字并缩小一百倍
 					mp3ins.pannerNode.pan.value = Math.min(Math.max(-1,v), 1);
 				}
 				mp3ins.getPanner = function() {
