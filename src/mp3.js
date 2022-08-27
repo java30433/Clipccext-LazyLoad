@@ -10,11 +10,12 @@ mp3.pushAudio = function(name, url) {
 		request.open('GET', url, true);
 		request.responseType = 'arraybuffer';
 		request.onload = () => {
+			try {
 			ctx.decodeAudioData(request.response, buffer => {
 				//下面开始初始化mp3Instance
 				mp3.list[name] = {};
 				const mp3ins = mp3.list[name];
-				mp3ins.src = url;
+				mp3ins.url = url;
 				mp3ins.buffer = buffer;
 				mp3ins.time = 0;
 				mp3ins.startTime = ctx.currentTime;
@@ -32,11 +33,13 @@ mp3.pushAudio = function(name, url) {
 				
 				//获取当前播放时长
 				mp3ins.getNow = function() {
+					let time;
 					if (mp3ins.isPlaying) {
-						return (ctx.currentTime - mp3ins.startTime)*mp3ins.rate + mp3ins.time;
+						time = (ctx.currentTime - mp3ins.startTime)*mp3ins.rate + mp3ins.time;
 					} else {
-						return mp3ins.time;
+						time = mp3ins.time;
 					}
+					return time%mp3ins.duration
 				}
 
 				//开始播放
@@ -50,11 +53,9 @@ mp3.pushAudio = function(name, url) {
 					mp3ins.source.playbackRate.value = mp3ins.rate; //应用播放倍率
 					//设置结束时的操作
 					mp3ins.source.onended = function() {
-						if (mp3ins.isPlaying) { //如果是通过pause方法暂停，playing会被先设为flase.如果是播完自动暂停就仍是true
-							mp3ins.isPlaying = false;
-							mp3ins.stopTime = ctx.currentTime;
-							mp3ins.time = (ctx.currentTime - mp3ins.startTime)*mp3ins.rate + mp3ins.time;
-						}
+						mp3ins.isPlaying = false;
+						mp3ins.stopTime = ctx.currentTime;
+						mp3ins.time = (ctx.currentTime - mp3ins.startTime)*mp3ins.rate + mp3ins.time;
 					};
 					
 					mp3ins.source.connect(mp3ins.gainNode); //链接音量节点
@@ -65,11 +66,13 @@ mp3.pushAudio = function(name, url) {
 					mp3ins.startTime = ctx.currentTime;
 				};
 				//暂停
-				mp3ins.pause = function() {
+				mp3ins.pause = function(callback) {
 					if(mp3ins.source) {
-						mp3ins.isPlaying = false;
-						mp3ins.stopTime = ctx.currentTime;
-						mp3ins.time = (ctx.currentTime - mp3ins.startTime)*mp3ins.rate + mp3ins.time;
+						if (callback) {
+							mp3ins.source.onended = function() {
+								callback();
+							};
+						}
 						mp3ins.source.stop(); //停止
 					}
 				}
@@ -84,9 +87,11 @@ mp3.pushAudio = function(name, url) {
 					
 					mp3ins.time = s;
 					if(mp3ins.isPlaying) {
-						mp3ins.isPlaying = false;
-						mp3ins.stopTime = ctx.currentTime;
-						mp3ins.source.stop(); //停止
+						mp3ins.pause(()=>{
+							mp3ins.isPlaying = false;
+							mp3ins.stopTime = ctx.currentTime;
+							mp3ins.play();
+						}); //停止并重放
 					}
 				}
 				
@@ -101,12 +106,17 @@ mp3.pushAudio = function(name, url) {
 				
 				//设置rate 动态更改
 				mp3ins.setRate = function(rate) {
-					mp3ins.rate = Math.min(Math.max(0, rate), 16);
+					//mp3ins.rate = Math.min(Math.max(0, rate), 16);
 					if (mp3ins.isPlaying) {
-						mp3ins.source.onended = function() {
+						mp3ins.pause(()=>{
+							mp3ins.isPlaying = false;
+							mp3ins.stopTime = ctx.currentTime;
+							mp3ins.time = (ctx.currentTime - mp3ins.startTime)*mp3ins.rate + mp3ins.time;
+							mp3ins.rate = rate;
 							mp3ins.play();
-						};
-						mp3ins.pause();
+						});
+					} else {
+						mp3ins.rate = rate;
 					}
 				}
 				
@@ -121,8 +131,13 @@ mp3.pushAudio = function(name, url) {
 				
 				resolve(); //OVER!
 			});
+			}
+			catch(e) {
+				if (mp3.list[name]) delete mp3.list[name];
+				resolve();
+			}
 		};
-		request.onerror = error => reject(error);
+		request.onerror = error => resolve();//只请求一次，失败就返回
 		request.send();
 	});
 };

@@ -47,7 +47,9 @@ class Lazyload extends Extension {
                 }
 			},
 			function: (args, util) => {
-				if (runtime.version.startsWith('c')) args.url = "https://api.codingclip.com/v1/project/asset/" + args.url;
+				if (runtime.version.startsWith('c') || ('/'.indexOf(args.url) == -1)) {
+					args.url = "https://api.codingclip.com/v1/project/asset/" + args.url;
+				}
 				if (mp3.get(args.name) && mp3.get(args.name).url == args.url) return; //如果已经加载了一样的就不重复加载了
 				return mp3.pushAudio(args.name, args.url);
 			}
@@ -71,17 +73,12 @@ class Lazyload extends Extension {
 						value: 'unloop'
 					}],
 					default: 'unloop'
-				},
-				rate: {
-					type: type.ParameterType.NUMBER,
-                    default: 1
 				}
 			},
 			function: args => {
 				if (!mp3.get(args.name)) return;
 				const mp3ins = mp3.get(args.name);
 				mp3ins.loop = (args.n == 'loop');
-				mp3ins.rate = isNaN(args.rate) ? 1 : Number(args.rate));
 				mp3ins.play();
 			}
 		});
@@ -94,9 +91,19 @@ class Lazyload extends Extension {
                     default: 'Ushio'
                 }
 			},
-			function: args => {
+			function: (args, util) => {
 				if (!mp3.get(args.name)) return;
-				mp3.get(args.name).pause();
+				const mp3ins = mp3.get(args.name);
+				if (!mp3ins.isPlaying) return;
+				return new Promise((resolve, reject)=>{
+					mp3ins.pause(()=>{
+						const ctx = mp3.audioContext;
+						mp3ins.isPlaying = false;
+						mp3ins.stopTime = ctx.currentTime;
+						mp3ins.time = (ctx.currentTime - mp3ins.startTime)*mp3ins.rate + mp3ins.time;
+						resolve();
+					});
+				});
 			}
 		});
 		addBlock({
@@ -130,6 +137,9 @@ class Lazyload extends Extension {
 					}, {
 						messageId: 'java30433.lazyload.menu.panner',
 						value: 'panner'
+					}, {
+						messageId: 'java30433.lazyload.menu.rate',
+						value: 'rate'
 					}],
 					default: 'volume'
 				},
@@ -155,6 +165,9 @@ class Lazyload extends Extension {
 						break;
 					case 'panner':
 						mp3ins.setPanner(v);
+						break;
+					case 'rate':
+						mp3ins.setRate(v);
 						break;
 				}
 			}
@@ -247,29 +260,6 @@ class Lazyload extends Extension {
 					case 'loop':
 						return mp3ins.loop;
 				}
-			}
-		});
-		addBlock({
-			opcode: 'setRate',
-			type: type.BlockType.COMMAND,
-			param: {
-				name: {
-                    type: type.ParameterType.STRING,
-                    default: 'Ushio'
-                },
-				rate: {
-					type: type.ParameterType.NUMBER,
-                    default: 1
-				}
-			},
-			function: args => {
-				if (!mp3.get(args.name)) return;
-				const mp3ins = mp3.get(args.name);
-				mp3ins.setRate(isNaN(args.rate) ? 1 : Number(args.rate));
-			},
-			option: {
-				//隐藏积木 播放过程中设置播放倍速会导致getNow()函数的偏差
-				filter: type.FilterType.HIDE
 			}
 		});
 	}
