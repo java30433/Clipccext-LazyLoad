@@ -39,7 +39,7 @@ mp3.pushAudio = function(name, url) {
 					} else {
 						time = mp3ins.time;
 					}
-					return time%mp3ins.duration
+					return time%mp3ins.duration;
 				}
 
 				//开始播放
@@ -56,6 +56,9 @@ mp3.pushAudio = function(name, url) {
 						mp3ins.isPlaying = false;
 						mp3ins.stopTime = ctx.currentTime;
 						mp3ins.time = (ctx.currentTime - mp3ins.startTime)*mp3ins.rate + mp3ins.time;
+						if (mp3ins.time > mp3ins.duration) {
+							mp3ins.time = mp3ins.duration;
+						}
 					};
 					
 					mp3ins.source.connect(mp3ins.gainNode); //链接音量节点
