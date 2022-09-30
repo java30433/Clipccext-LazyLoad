@@ -1,0 +1,23 @@
+{
+    "java30433.lazyload.name": "懶加載音樂",
+    "java30433.lazyload.category": "懶加載音樂",
+    "java30433.lazyload.description": "懶加載音樂",
+    "java30433.lazyload.block.loadMusic": "從[url]載入音樂並儲存為[name]",
+    "java30433.lazyload.block.playMusic": "播放音樂[name]並[n]",
+    "java30433.lazyload.block.pauseMusic": "暫停音樂[name]",
+    "java30433.lazyload.block.deleteMusic": "刪除音樂[name]",
+    "java30433.lazyload.block.setMusicEffect": "將音樂[name]的[n]設為[v]",
+    "java30433.lazyload.menu.loop": "循環播放",
+    "java30433.lazyload.menu.unloop": "播完自動停止",
+    "java30433.lazyload.block.getMusicState": "音樂[name]的[n]",
+    "java30433.lazyload.menu.currentTime": "播放進度",
+    "java30433.lazyload.menu.duration": "總長度",
+    "java30433.lazyload.menu.rate": "播放倍速",
+    "java30433.lazyload.menu.volume": "音量",
+    "java30433.lazyload.menu.panner": "左右平衡",
+    "java30433.lazyload.menu.panning": "左右平衡",
+    "java30433.lazyload.block.getMusicStateBool": "音樂[name]是否[n]?",
+    "java30433.lazyload.menu.ended": "播放完畢",
+    "java30433.lazyload.menu.playing": "播放中",
+    "java30433.lazyload.menu.loaded": "加載完畢"
+}
