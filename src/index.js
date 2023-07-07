@@ -7,6 +7,7 @@ class Lazyload extends Extension {
 	}
     onInit() {
 		const runtime = api.getVmInstance().runtime;
+		// @ts-ignore
 		const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 		api.addCategory({
 			categoryId: 'java30433.lazyload.category',
@@ -47,11 +48,12 @@ class Lazyload extends Extension {
                 }
 			},
 			function: (args, util) => {
-				if (runtime.version.startsWith('c') || ('/'.indexOf(args.url) == -1)) {
-					args.url = "https://api.codingclip.com/v1/project/asset/" + args.url;
+				let url = args.url; //务必把args当常量用，因为args是有缓存的。
+				if (runtime.version.startsWith('c') || ('/'.indexOf(url) == -1)) {
+					url = "https://api.codingclip.com/v1/project/asset/" + url;
 				}
-				if (mp3.get(args.name) && mp3.get(args.name).url == args.url) return; //如果已经加载了一样的就不重复加载了
-				return mp3.pushAudio(args.name, args.url);
+				if (mp3.get(args.name) && mp3.get(args.name).url == url) return; //如果已经加载了一样的就不重复加载了
+				return mp3.pushAudio(args.name, url);
 			}
 		});
 		addBlock({
