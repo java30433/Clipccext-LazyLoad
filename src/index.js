@@ -48,8 +48,12 @@ class Lazyload extends Extension {
                 }
 			},
 			function: (args, util) => {
-				let url = args.url; //务必把args当常量用，因为args是有缓存的。
-				if (runtime.version.startsWith('c') || ('/'.indexOf(url) == -1)) {
+				let url = String(args.url); //务必把args当常量用，因为args是有缓存的。
+				if (
+				  runtime.version.startsWith('c')
+				  ||
+				  !url.includes('/')
+				){
 					url = "https://api.codingclip.com/v1/project/asset/" + url;
 				}
 				if (mp3.get(args.name) && mp3.get(args.name).url == url) return; //如果已经加载了一样的就不重复加载了
