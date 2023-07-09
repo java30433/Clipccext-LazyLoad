@@ -49,10 +49,13 @@ class Lazyload extends Extension {
 			},
 			function: (args, util) => {
 				let url = String(args.url); //务必把args当常量用，因为args是有缓存的。
-				if (
-				  runtime.version.startsWith('c')
-				  ||
-				  !url.includes('/')
+				if(
+				  (
+					runtime.version.startsWith('c') //是社区版
+				  	||
+				  	!url.includes('/') //不含斜杠
+				  )
+				  && !/^data\:/.test(url) //不以 data: 开头
 				){
 					url = "https://api.codingclip.com/v1/project/asset/" + url;
 				}
